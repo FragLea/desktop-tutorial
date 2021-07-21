@@ -1,0 +1,158 @@
+﻿<Window x:Name="WindowNorthwindDataDisplay" x:Class="DataPresent.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DataPresent"
+        mc:Ignorable="d"
+        Title="Northwind" Width="1057.775" Icon="/icons8-database-64.png" Height="481" ResizeMode="NoResize">
+
+    <Grid x:Name="grdBasicGrid" Margin="0,0,3.2,-19.8">
+
+        <GroupBox x:Name="grbProductDataRow" Header="Product Data" HorizontalAlignment="Left" Height="143" Margin="176,263,0,0" VerticalAlignment="Top" Width="473" Visibility="Hidden">
+            <Grid x:Name="gridDataViewGrid" Height="150" Margin="-6,-16,-2.2,-14" VerticalAlignment="Top">
+                <Label x:Name="lblFixProductID" Content="ID:" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="10" RenderTransformOrigin="3.795,2.783" Margin="0,13,0,0"/>
+                <Label x:Name="lblFixCompany" Content="Company:" HorizontalAlignment="Left" Margin="0,39,0,0" VerticalAlignment="Top" FontSize="10"/>
+                <Label x:Name="lblFixProductName" Content="Product:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="53,13,0,0" FontSize="10"/>
+                <Label x:Name="lblFixCategory" Content="Category:" HorizontalAlignment="Left" Margin="0,63,0,0" VerticalAlignment="Top" FontSize="10"/>
+                <Label x:Name="lblFixQuantityPerUnit" Content="Quantity per Unit:" HorizontalAlignment="Left" Margin="0,87,0,0" VerticalAlignment="Top" FontSize="10"/>
+                <Label x:Name="lblFixUnitPrice" Content="Price per Unit:" HorizontalAlignment="Left" Margin="0,111,0,0" VerticalAlignment="Top" FontSize="10"/>
+                <Label x:Name="lblFixUnitsInStock" Content="Units in Stock:" HorizontalAlignment="Left" Margin="239,39,0,0" VerticalAlignment="Top" FontSize="10"/>
+
+                <TextBox x:Name="txtIDProduct" Text="{Binding SelectedItem.ProductID, ElementName=dgvProducts}" HorizontalAlignment="Left" Height="17" Margin="22,17,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="26" FontSize="10" MaxLines="1" MaxLength="3" IsReadOnly="True"/>
+                <TextBox x:Name="txtProductName" Text="{Binding SelectedItem.ProductName, ElementName=dgvProducts}" HorizontalAlignment="Left" Height="17" Margin="104,17,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="184" FontSize="10" IsReadOnly="True"/>
+                <TextBox x:Name="txtQuantityPerUnit" Text="{Binding SelectedItem.QuantityPerUnit, ElementName=dgvProducts}" HorizontalAlignment="Left" Height="17" Margin="88,92,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="146" FontSize="10" IsReadOnly="True"/>
+                <TextBox x:Name="txtUnitPrice" Text="{Binding SelectedItem.UnitPrice, ElementName=dgvProducts}" HorizontalAlignment="Left" Height="17" Margin="77,114,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="157" FontSize="10" IsReadOnly="True"/>
+                <TextBox x:Name="txtUnitsInStock" Text="{Binding SelectedItem.UnitsInStock, ElementName=dgvProducts}" HorizontalAlignment="Left" Height="17" Margin="311,42,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="58" FontSize="10" IsReadOnly="True"/>
+
+                <ComboBox x:Name="cboCompany" ItemsSource="{Binding Path=companyList.Name}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedValue="{Binding SelectedItem.CompanyName, ElementName=dgvProducts}" HorizontalAlignment="Left" Margin="59,39,0,0" VerticalAlignment="Top" Width="175" FontSize="10" IsReadOnly="True" AllowDrop="True" DropDownOpened="cboCompany_DropDownOpened"/>
+                <ComboBox x:Name="cboCategory" ItemsSource="{Binding Path=categoryList.Name}" DisplayMemberPath="Name" SelectedValuePath="Name" SelectedValue="{Binding SelectedItem.CategoryName, ElementName=dgvProducts}" HorizontalAlignment="Left" Margin="59,67,0,0" VerticalAlignment="Top" Width="175" Height="20" FontSize="10" IsReadOnly="True" DropDownOpened="cboCategory_DropDownOpened"/>
+
+                <CheckBox x:Name="chkDiscontinued" IsChecked="{Binding SelectedItem.Discontinued, ElementName=dgvProducts}" Content=":Discontinued"  FlowDirection="RightToLeft" HorizontalAlignment="Left" Margin="239,69,0,0" VerticalAlignment="Top" FontSize="10" IsEnabled="False">
+                    <CheckBox.Resources>
+                        <Style TargetType="{x:Type Path}">
+                            <Setter Property="FlowDirection" Value="LeftToRight" />
+                        </Style>
+                    </CheckBox.Resources>
+                </CheckBox>
+
+                <Button x:Name="btnUpdate" Content="Edit Product" HorizontalAlignment="Left" Margin="374,17,0,0" VerticalAlignment="Top" Width="87" IsDefault="True" Click="btnUpdate_Click" IsEnabled="False"/>
+                <Button x:Name="btnInsert" Content="Create Product" HorizontalAlignment="Left" Margin="374,40,0,0" VerticalAlignment="Top" Width="87" IsDefault="True" Click="btnInsert_Click" IsEnabled="False"/>
+                <Button x:Name="btnDelete" Content="Delete Product" HorizontalAlignment="Left" Margin="374,63,0,0" VerticalAlignment="Top" Width="87" IsDefault="True" Click="btnDelete_Click" IsEnabled="False"/>
+            </Grid>
+
+        </GroupBox>
+        <Button x:Name="btnExit" Content="Exit" HorizontalAlignment="Left" Margin="572,419,0,0" VerticalAlignment="Top" Width="75" FontWeight="Bold" Click="btnExit_Click"/>
+        <Button x:Name="btnDisconnect" Content="Disconnect" HorizontalAlignment="Left" Margin="491,419,0,0" VerticalAlignment="Top" Width="76" FontStyle="Italic" Click="btnDisconnect_Click" IsEnabled="False"/>
+        <Button x:Name="btnConnect" Content="Connect" HorizontalAlignment="Left" Margin="411,419,0,0" VerticalAlignment="Top" Width="75" Click="btnConnect_Click" FontStyle="Italic"/>
+
+        <GroupBox x:Name="grbProductFilter" Header="Product Filter" HorizontalAlignment="Left" Height="175" Margin="654,263,0,0" VerticalAlignment="Top" Width="380" IsEnabled="False" IsEnabledChanged="grbProductFilter_IsEnabledChanged" Visibility="Hidden">
+            <Grid x:Name="grdProductFilter" HorizontalAlignment="Left" Height="181" Margin="-10,-16,-2,-13" VerticalAlignment="Top" Width="380">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="98*"/>
+                    <RowDefinition Height="83*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="181*"/>
+                    <ColumnDefinition Width="205*"/>
+                </Grid.ColumnDefinitions>
+                <RadioButton x:Name="rdoFilterPAll" Content="Show all Products" HorizontalAlignment="Left" Margin="10,20,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.363,0.579" GroupName="ProductFilter" Height="15" Width="113" Checked="rdoFilterPAll_Checked"/>
+                <RadioButton x:Name="rdoFilterPGroupCompanies" Content="Products per Company" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.363,0.579" GroupName="ProductFilter" Height="15" Width="140" Checked="rdoFilterPGroupCompanies_Checked"/>
+                <RadioButton x:Name="rdoFilterPGroupCategories" Content="Products Per Category" HorizontalAlignment="Left" Margin="10,60,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.363,0.579" GroupName="ProductFilter" Checked="rdoFilterPGroupCategories_Checked" Height="15" Width="137"/>
+                <RadioButton x:Name="rdoFilterPOneCompany" Content="Show Products to Company: " HorizontalAlignment="Left" Margin="10,0.4,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.363,0.579" GroupName="ProductFilter" Grid.ColumnSpan="2" Height="15" Width="172" Grid.Row="1" Checked="rdoFilterPoneCompany_Checked" Unchecked="rdoFilterPOneCompany_Unchecked"/>
+                <RadioButton x:Name="rdoFilterPOneCategory" Content="Show Products to Category: " HorizontalAlignment="Left" Margin="10,25.4,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.363,0.579" GroupName="ProductFilter" Height="15" Width="170" Grid.Row="1" Checked="rdoFilterPoneCategory_Checked" Unchecked="rdoFilterPOneCategory_Unchecked"/>
+                <RadioButton x:Name="rdoFilterPPrice" Content="Products in Price Range:" HorizontalAlignment="Left" Margin="11.2,18,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.363,0.579" GroupName="ProductFilter" Height="15" Width="147" Grid.Column="1" Checked="rdoFilterPPrice_Checked" Unchecked="rdoFilterPPrice_Unchecked"/>
+                <ComboBox x:Name="cboFilterCompany" DisplayMemberPath="Name" SelectedValuePath="Name" HorizontalAlignment="Left" Margin="20.2,0.4,0,0" VerticalAlignment="Top" Width="175" FontSize="10" IsReadOnly="True" AllowDrop="True" DropDownOpened="cboFilterCompany_DropDownOpened" Grid.Column="1" Grid.Row="1" Height="20" IsEnabled="False"/>
+                <ComboBox x:Name="cboFilterCategory" DisplayMemberPath="Name" SelectedValuePath="Name" HorizontalAlignment="Left" Margin="20.2,25.4,0,0" VerticalAlignment="Top" Width="175" Height="20" FontSize="10" IsReadOnly="True" Grid.Column="1" Grid.Row="1" DropDownOpened="cboFilterCategory_DropDownOpened" IsEnabled="False"/>
+                <Grid x:Name="grdPrice" Grid.Column="1" Margin="0.6,38,26,12.6" IsEnabled="False">
+                    <RadioButton x:Name="rdoFilterPPriceLess" Content="under" HorizontalAlignment="Left" Margin="0,2,0,0" VerticalAlignment="Top" Checked="rdoFilterPPriceLess_Checked" GroupName="Price" Height="15" Width="50" Unchecked="rdoFilterPPriceLess_Unchecked"/>
+                    <RadioButton x:Name="rdoFilterPPriceBetween" Content="between" HorizontalAlignment="Left" Margin="0,17,0,0" VerticalAlignment="Top" GroupName="Price" Height="15" Width="65" Checked="rdoFilterPPriceBetween_Checked" Unchecked="rdoFilterPPriceBetween_Unchecked"/>
+                    <RadioButton x:Name="rdoFilterPPriceAbove" Content="above" HorizontalAlignment="Left" Margin="0,32,0,0" VerticalAlignment="Top" GroupName="Price" Height="15" Width="51" Checked="rdoFilterPPriceAbove_Checked" Unchecked="rdoFilterPPriceAbove_Unchecked"/>
+                    <TextBox x:Name="txtFilterUnder" HorizontalAlignment="Left" Height="17" Margin="70,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="35" FontSize="10"/>
+                    <TextBox x:Name="txtFilterBetween1" HorizontalAlignment="Left" Height="17" Margin="70,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="35" FontSize="10"/>
+                    <TextBox x:Name="txtFilterAbove" HorizontalAlignment="Left" Height="17" Margin="70,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="35" FontSize="10"/>
+                    <Label x:Name="lblFixFilterand" Content="and" HorizontalAlignment="Left" Margin="105,11,0,0" VerticalAlignment="Top" Height="26" Width="30"/>
+                    <TextBox x:Name="txtFilterBetween2" HorizontalAlignment="Left" Height="17" Margin="136,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="35" FontSize="10"/>
+                </Grid>
+                <Button x:Name="btnExit_Copy" Content="Exit" HorizontalAlignment="Left" Margin="391.2,329.4,-261.4,-263.2" VerticalAlignment="Top" Width="75" FontWeight="Bold" Click="btnExit_Click" Grid.Column="1" Grid.Row="1" Height="17"/>
+                <Button x:Name="btnProductFilter" Content="Filter" HorizontalAlignment="Left" Margin="120.2,53.4,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Grid.Row="1" Height="20" Click="btnFilter_Click" IsEnabled="False"/>
+                <Button x:Name="btnProductFilterDeactivate" Content="Deactivate Filter" HorizontalAlignment="Left" Margin="76,53.4,0,0" VerticalAlignment="Top" Width="92" Grid.Row="1" Height="20" IsEnabled="False" Click="btnFilterDeactivate_Click" RenderTransformOrigin="-0.176,0.3"/>
+                <Grid HorizontalAlignment="Left" Height="53" Margin="-94,-89,0,0" VerticalAlignment="Top" Width="196"/>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="btnProductFilterActivate" Content="Activate Filter" HorizontalAlignment="Left" Margin="654,415,0,0" VerticalAlignment="Top" Width="75" Height="20" IsEnabled="False" Click="btnFilterActivate_Click" Visibility="Hidden"/>
+
+        <Border x:Name="brdDataView" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="253" Margin="10,10,0,0" VerticalAlignment="Top" Width="1028"/>
+
+        <Image x:Name="pngJelly" Margin="10,263,877,38" Source="ho7ps1gv.bmp" Stretch="Fill" MouseLeftButtonDown="pngJelly_MouseLeftButtonDown"/>
+        <Label x:Name="lblPngExplanation" Content="&lt;--This is a random jellyfish :P" HorizontalAlignment="Left" Margin="176,406,0,0" VerticalAlignment="Top" Height="26" Width="173"/>
+        <TabControl x:Name="tabNorthwind" HorizontalAlignment="Left" Height="253" Margin="10,10,0,0" VerticalAlignment="Top" Width="1024" SelectionChanged="tabNorthwind_SelectionChanged" IsEnabled="False">
+            <TabItem x:Name="TabProduct">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/icons8-product-24.png" Width="16px" Height="16px" />
+                        <TextBlock Text="Products" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid x:Name="grdProductdgv" Background="#FFE5E5E5">
+                    <DataGrid x:Name="dgvProducts" ItemsSource="{Binding}" AreRowDetailsFrozen="True" IsReadOnly="True" ColumnWidth="*" SelectionChanged="dgvNorthwind_SelectionChanged" IsSynchronizedWithCurrentItem="True" Margin="0,0,0.4,-0.2"/>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="TabCompany">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/icons8-company-24.png" Width="16px" Height="16px" />
+                        <TextBlock Text="Companies" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid x:Name="grdCompanydgv" Background="#FFE5E5E5">
+                    <DataGrid x:Name="dgvCompanies" ItemsSource="{Binding}" AreRowDetailsFrozen="True" IsReadOnly="True" ColumnWidth="*" SelectionChanged="dgvCompanies_SelectionChanged" IsSynchronizedWithCurrentItem="True" HorizontalAlignment="Left" Height="225" VerticalAlignment="Top" Width="1018" Margin="0,0,0,-0.2"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <GroupBox x:Name="grbCompanyDataRow" Header="CompanyData" HorizontalAlignment="Left" Height="143" Margin="176,268,0,0" VerticalAlignment="Top" Width="473" Visibility="Hidden">
+            <Grid x:Name="grdCompany" HorizontalAlignment="Left" Height="140" Margin="0,-7,-8.2,-13" VerticalAlignment="Top" Width="469">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="51*"/>
+                    <ColumnDefinition Width="16*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="btnAddCompany" Content="New Company" Grid.Column="1" Margin="0.2,34,9.8,0" VerticalAlignment="Top" Height="19" Click="btnAddCompany_Click"/>
+                <Button x:Name="btnEditCompany" Content="Edit Company" Grid.Column="1" Margin="0.2,10,9.8,0" VerticalAlignment="Top" Height="19" Click="btnEditCompany_Click"/>
+                <Button x:Name="btnDeleteCompany" Content="Delete Company" Margin="0.2,58,9.8,0" VerticalAlignment="Top" Grid.Column="1" Height="19" Click="btnDeleteCompany_Click"/>
+
+                <Label x:Name="lbFixAddress" Content="Address:" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="1.608,1.992" Margin="147,57,0,0" Height="26" Width="50" FontSize="10"/>
+                <Label x:Name="lblFixCompanyID" Content="ID:" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="1.608,1.992" Margin="0,10,0,0" Height="26" Width="24" FontSize="10"/>
+                <Label x:Name="lblFixCompanyName" Content="Company Name:" HorizontalAlignment="Left" Margin="63,10,0,0" VerticalAlignment="Top" FontSize="10"/>
+                <Label x:Name="lbFixContactName" Content="Contact Name:" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="1.608,1.992" Margin="0,34,0,0" Height="26" Width="77" FontSize="10"/>
+                <Label x:Name="lbFixContactTitle" Content="Title:" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="1.608,1.992" Margin="0,57,0,0" Height="26" Width="32" FontSize="10"/>
+                <Label x:Name="lbFixCity" Content="City:" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="1.608,1.992" Margin="0,82,0,0" Height="26" Width="32" FontSize="10"/>
+                <Label x:Name="lbFixPostalCode" Content="Postal Code:" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="1.608,1.992" Margin="120,82,0,0" Height="26" Width="65" FontSize="10"/>
+                <Label x:Name="lbFixPhone" Content="Phone:" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="1.608,1.992" Margin="0,106,0,0" Height="26" Width="42" FontSize="10"/>
+                <Label x:Name="lbFixCountry" Content="Country:" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="1.608,1.992" Margin="155,106,0,0" Height="26" Width="50" FontSize="10"/>
+
+                <TextBox x:Name="txtCompanyName" Text="{Binding SelectedItem.CompanyName, ElementName=dgvCompanies}" HorizontalAlignment="Left" Height="19" Margin="146,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="138" FontSize="10" IsReadOnly="True"/>
+                <TextBox x:Name="txtIDCompany" Text="{Binding SelectedItem.CompanyID, ElementName=dgvCompanies}" HorizontalAlignment="Left" Height="19" Margin="24,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="34" MaxLines="1" MaxLength="3" FontSize="10" IsReadOnly="True"/>
+                <TextBox x:Name="txtContactName" Text="{Binding SelectedItem.ContactName, ElementName=dgvCompanies}" HorizontalAlignment="Left" Height="19" Margin="77,34,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="128" FontSize="10" IsReadOnly="True"/>
+                <TextBox x:Name="txtAddress" Text="{Binding SelectedItem.Address, ElementName=dgvCompanies}" HorizontalAlignment="Left" Height="19" Margin="192,58,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="155" FontSize="10" IsReadOnly="True"/>
+                <TextBox x:Name="txtTitle" Text="{Binding SelectedItem.ContactTitle, ElementName=dgvCompanies}" HorizontalAlignment="Left" Height="19" Margin="37,58,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="110"  FontSize="10" IsReadOnly="True"/>
+                <TextBox x:Name="txtCity" Text="{Binding SelectedItem.City, ElementName=dgvCompanies}" HorizontalAlignment="Left" Height="19" Margin="32,82,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="83"  FontSize="10" IsReadOnly="True"/>
+                <TextBox x:Name="txtPostalCode" Text="{Binding SelectedItem.PostalCode, ElementName=dgvCompanies}" HorizontalAlignment="Left" Height="19" Margin="185,82,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="68" FontSize="10" IsReadOnly="True"/>
+                <TextBox x:Name="txtPhone" Text="{Binding SelectedItem.Phone, ElementName=dgvCompanies}" HorizontalAlignment="Left" Height="19" Margin="42,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="111" FontSize="10" RenderTransformOrigin="0.565,0.418" IsReadOnly="True"/>
+                <TextBox x:Name="txtCountry" Text="{Binding SelectedItem.Country, ElementName=dgvCompanies}" HorizontalAlignment="Left" Height="19" Margin="205,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="114" FontSize="10" IsReadOnly="True"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="grbCompanyFilter" Header="Company Filter" HorizontalAlignment="Left" Height="175" Margin="658,268,0,0" VerticalAlignment="Top" Width="380" Visibility="Hidden">
+            <Grid HorizontalAlignment="Left" Height="177" VerticalAlignment="Top" Width="370" Margin="0,-12,-2,-13" Visibility="Hidden">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="166*"/>
+                    <ColumnDefinition Width="203*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="btnCompanyFilter" Content="Filter" HorizontalAlignment="Left" Margin="118.6,147,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="btnFilter_Click" Grid.Column="1"/>
+                <Button x:Name="btnCompanyFilterDeactivate" Content="Deactivate Filter" HorizontalAlignment="Left" Margin="64,147,0,0" VerticalAlignment="Top" Width="92" Height="20" Click="btnFilterDeactivate_Click" RenderTransformOrigin="-0.176,0.3"/>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="btnCompanyFilterActivate" Content="Activate Filter" HorizontalAlignment="Left" Margin="656,416,0,0" VerticalAlignment="Top" Width="75" Height="20" IsEnabled="False" Click="btnFilterActivate_Click" Visibility="Hidden"/>
+
+    </Grid>
+</Window>

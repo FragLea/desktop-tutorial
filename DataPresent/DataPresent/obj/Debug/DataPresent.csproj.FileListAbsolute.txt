@@ -1,0 +1,17 @@
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\bin\Debug\DataPresent.exe.config
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\bin\Debug\DataPresent.exe
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\bin\Debug\DataPresent.pdb
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\DataPresent.csproj.AssemblyReference.cache
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\MainWindow.g.cs
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\App.g.cs
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\DataPresent_MarkupCompile.cache
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\DataPresent_MarkupCompile.lref
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\MainWindow.baml
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\DataPresent.g.resources
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\DataPresent.Properties.Resources.resources
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\DataPresent.csproj.GenerateResource.cache
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\DataPresent.csproj.CoreCompileInputs.cache
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\DataPresent.exe
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\DataPresent.pdb
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\bin\Debug\DotNetProjects.DataVisualization.Toolkit.dll
+C:\UserData\z004ckzv\Documents\GitHub\desktop-tutorial\DataPresent\DataPresent\obj\Debug\DataPresent.csproj.CopyComplete
