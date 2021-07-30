@@ -57,7 +57,7 @@ namespace DataPresent
             //clear command
             command.CommandText = null;
             return categoryList;
-        }
+        } 
 
         public List<Company> getCompanySqlList(string sqlCommandString, List<Company> companyList)
         {

@@ -75,16 +75,15 @@
                     <TextBox x:Name="txtFilterBetween2" HorizontalAlignment="Left" Height="17" Margin="136,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="35" FontSize="10"/>
                 </Grid>
                 <Button x:Name="btnExit_Copy" Content="Exit" HorizontalAlignment="Left" Margin="391.2,329.4,-261.4,-263.2" VerticalAlignment="Top" Width="75" FontWeight="Bold" Click="btnExit_Click" Grid.Column="1" Grid.Row="1" Height="17"/>
-                <Button x:Name="btnProductFilter" Content="Filter" HorizontalAlignment="Left" Margin="120.2,53.4,0,0" VerticalAlignment="Top" Width="75" Grid.Column="1" Grid.Row="1" Height="20" Click="btnFilter_Click" IsEnabled="False"/>
-                <Button x:Name="btnProductFilterDeactivate" Content="Deactivate Filter" HorizontalAlignment="Left" Margin="76,53.4,0,0" VerticalAlignment="Top" Width="92" Grid.Row="1" Height="20" IsEnabled="False" Click="btnFilterDeactivate_Click" RenderTransformOrigin="-0.176,0.3"/>
                 <Grid HorizontalAlignment="Left" Height="53" Margin="-94,-89,0,0" VerticalAlignment="Top" Width="196"/>
             </Grid>
         </GroupBox>
-        <Button x:Name="btnProductFilterActivate" Content="Activate Filter" HorizontalAlignment="Left" Margin="654,415,0,0" VerticalAlignment="Top" Width="75" Height="20" IsEnabled="False" Click="btnFilterActivate_Click" Visibility="Hidden"/>
+        <Button x:Name="btnFilterActivate" Content="Activate Filter" HorizontalAlignment="Left" Margin="664,416,0,0" VerticalAlignment="Top" Width="75" Height="20" IsEnabled="False" Click="btnFilterActivate_Click" Visibility="Hidden"/>
+        <Button x:Name="btnFilterDeactivate" Content="Deactivate Filter" HorizontalAlignment="Left" Margin="865,416,0,0" VerticalAlignment="Top" Width="93" Height="20" IsEnabled="False" Click="btnFilterDeactivate_Click" RenderTransformOrigin="-0.176,0.3" Visibility="Hidden"/>
 
         <Border x:Name="brdDataView" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="253" Margin="10,10,0,0" VerticalAlignment="Top" Width="1028"/>
 
-        <Image x:Name="pngJelly" Margin="10,263,877,38" Source="ho7ps1gv.bmp" Stretch="Fill" MouseLeftButtonDown="pngJelly_MouseLeftButtonDown"/>
+        <Image x:Name="pngJelly" Margin="10,263,877,38" Source="ho7ps1gv.bmp" Stretch="Fill" MouseLeftButtonDown="pngJelly_MouseLeftButtonDown" Visibility="{Binding startedConnNorthwind}"/>
         <Label x:Name="lblPngExplanation" Content="&lt;--This is a random jellyfish :P" HorizontalAlignment="Left" Margin="176,406,0,0" VerticalAlignment="Top" Height="26" Width="173"/>
         <TabControl x:Name="tabNorthwind" HorizontalAlignment="Left" Height="253" Margin="10,10,0,0" VerticalAlignment="Top" Width="1024" SelectionChanged="tabNorthwind_SelectionChanged" IsEnabled="False">
             <TabItem x:Name="TabProduct">
@@ -142,17 +141,35 @@
                 <TextBox x:Name="txtCountry" Text="{Binding SelectedItem.Country, ElementName=dgvCompanies}" HorizontalAlignment="Left" Height="19" Margin="205,106,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="114" FontSize="10" IsReadOnly="True"/>
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="grbCompanyFilter" Header="Company Filter" HorizontalAlignment="Left" Height="175" Margin="658,268,0,0" VerticalAlignment="Top" Width="380" Visibility="Hidden">
-            <Grid HorizontalAlignment="Left" Height="177" VerticalAlignment="Top" Width="370" Margin="0,-12,-2,-13" Visibility="Hidden">
+        <GroupBox x:Name="grbCompanyFilter" Header="Company Filter" HorizontalAlignment="Left" Height="143" Margin="658,268,0,0" VerticalAlignment="Top" Width="380" IsEnabledChanged="grbCompanyFilter_IsEnabledChanged" IsEnabled="False" Visibility="Hidden">
+            <Grid x:Name="grdCompanyFilter" HorizontalAlignment="Left" Height="175" VerticalAlignment="Top" Width="380" Margin="0,0,-12,-23">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="166*"/>
-                    <ColumnDefinition Width="203*"/>
+                    <ColumnDefinition Width="13*"/>
+                    <ColumnDefinition Width="64*"/>
+                    <ColumnDefinition Width="113*"/>
                 </Grid.ColumnDefinitions>
-                <Button x:Name="btnCompanyFilter" Content="Filter" HorizontalAlignment="Left" Margin="118.6,147,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="btnFilter_Click" Grid.Column="1"/>
-                <Button x:Name="btnCompanyFilterDeactivate" Content="Deactivate Filter" HorizontalAlignment="Left" Margin="64,147,0,0" VerticalAlignment="Top" Width="92" Height="20" Click="btnFilterDeactivate_Click" RenderTransformOrigin="-0.176,0.3"/>
+                <RadioButton x:Name="rdoFilterCAll" Content="Show all Companies" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.363,0.579" GroupName="CompanyFilter" Height="15" Width="127" Grid.ColumnSpan="2" Checked="rdoFilterCAll_Checked"/>
+                <RadioButton x:Name="rdoFilterCPerCountry" Content="Companies per Country" HorizontalAlignment="Left" Margin="10,30,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.363,0.579" GroupName="CompanyFilter" Height="15" Width="146" Checked="rdoFilterCPerCountry_Checked" Grid.ColumnSpan="3"/>
+                <RadioButton x:Name="rdoFilterCLookUpCountry" Content="Look Up Country" HorizontalAlignment="Left" Margin="10,50,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.363,0.579" GroupName="CompanyFilter" Height="15" Width="127" Checked="rdoFilterCLookUpCountry_Checked" Grid.ColumnSpan="2" Unchecked="rdoFilterCLookUpCountry_Unchecked"/>
+                <RadioButton x:Name="rdoFilterCSortByNameLenght" Content="Sort by Name Lenght" HorizontalAlignment="Left" Margin="78.6,13,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.363,0.579" GroupName="CompanyFilter" Height="15" Width="137" Checked="rdoFilterCSortByNameLenght_Checked" Grid.Column="2" Unchecked="rdoFilterCSortByNameLenght_Unchecked"/>
+                <Grid x:Name="grdFilterCNameWithLetters" HorizontalAlignment="Left" Height="55" Margin="6.6,68,0,0" VerticalAlignment="Top" Width="183" Grid.Column="2">
+                    <TextBox x:Name="txtFilterCLetters" HorizontalAlignment="Left" Height="23" Margin="10,8,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <RadioButton x:Name="rdoFilterCompanyAny" Content="any" HorizontalAlignment="Left" Margin="135,10,0,0" VerticalAlignment="Top" GroupName="letterFilter"/>
+                    <RadioButton x:Name="rdoFilterCompanyBegin" Content="beginning" HorizontalAlignment="Left" Margin="0,36,0,0" VerticalAlignment="Top" GroupName="letterFilter"/>
+                    <RadioButton x:Name="rdoFilterCompanyMiddle" Content="middle" HorizontalAlignment="Left" Margin="78,36,0,0" VerticalAlignment="Top" GroupName="letterFilter" RenderTransformOrigin="-1.186,2.487"/>
+                    <RadioButton x:Name="rdoFilterCompanyEnd" Content="end" HorizontalAlignment="Left" Margin="139,36,0,0" VerticalAlignment="Top" GroupName="letterFilter"/>
+                </Grid>
+                <Grid x:Name="grdCSort" HorizontalAlignment="Left" Height="35" Margin="108.6,30,0,0" VerticalAlignment="Top" Width="107" Grid.Column="2">
+                    <RadioButton x:Name="rdoFilterCompanySortAsc" Content="ascending" HorizontalAlignment="Left" VerticalAlignment="Top" GroupName="letterSort"/>
+                    <RadioButton x:Name="rdoFilterCompanySortDesc"  Content="descending" HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" GroupName="letterSort"/>
+                </Grid>
+                <ComboBox x:Name="cboCountries" Grid.Column="1" HorizontalAlignment="Right" Margin="0,46,133,0" VerticalAlignment="Top" Width="120" Grid.ColumnSpan="2" IsSynchronizedWithCurrentItem="False"/>
+                <RadioButton x:Name="rdoFilterCCompaniesContaining" HorizontalAlignment="Left" Margin="10,78,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.363,0.579" GroupName="CompanyFilter" Height="45" Width="146" Checked="rdoFilterCCompaniesContaining_Checked" Grid.ColumnSpan="3" Unchecked="rdoFilterCCompaniesContaining_Unchecked">
+                    <TextBlock x:Name="txtbCompaniesContaining" TextWrapping="Wrap" Height="35" Width="119" PreviewMouseDown="txtbCompaniesContaining_PreviewMouseDown"><Run Text="Companies containin"/><Run Text="g"/><Run Text=" the letter(s):"/></TextBlock>
+                </RadioButton>
             </Grid>
         </GroupBox>
-        <Button x:Name="btnCompanyFilterActivate" Content="Activate Filter" HorizontalAlignment="Left" Margin="656,416,0,0" VerticalAlignment="Top" Width="75" Height="20" IsEnabled="False" Click="btnFilterActivate_Click" Visibility="Hidden"/>
+        <Button x:Name="btnFilter" Content="Filter" HorizontalAlignment="Left" Margin="963,416,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="btnFilter_Click" IsEnabled="False" Visibility="Hidden"/>
 
     </Grid>
 </Window>

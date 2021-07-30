@@ -30,13 +30,15 @@ namespace DataPresent
         public bool deleteActive = false;               //-||-
         public bool formLocked = true;                  //to lock the form except for when user needs to edit it. false locks ID
         public bool tabLocked = true;
-        public bool filterActive = false;
-        public string currentFilter = "none";
+        public bool filterProductActive = false;
+        public bool filterCompanyActive = false;
+        public string currentProductFilter = "none";
+        public string currentCompanyFilter = "none";
         DataTable tableProducts = new DataTable();
         DataTable tableCompanies = new DataTable();
         DataTable tableFilter = new DataTable();
         Random randInt = new Random();                  //if random is needed
-        
+
 
         public int currentIDProduct = 0;                  //starts from 0!
         public int currentIDCompany = 0;
@@ -60,13 +62,14 @@ namespace DataPresent
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
+
         {
             if (startedConnNorthwind == false)
             {
                 //build the connection to Northwind database
                 MessageBox.Show("Connection established", Title = "Connectionwindow");
                 northwind.startConnection();
-                startedConnNorthwind = true;    
+                startedConnNorthwind = true;
 
                 //Enable/Disable Buttons
                 //general
@@ -76,7 +79,6 @@ namespace DataPresent
                 btnInsert.IsEnabled = true;
                 btnUpdate.IsEnabled = true;
                 btnDelete.IsEnabled = true;
-                btnProductFilterActivate.IsEnabled = true;
                 //Company
                 btnAddCompany.IsEnabled = true;
                 btnEditCompany.IsEnabled = true;
@@ -93,7 +95,15 @@ namespace DataPresent
                 companyList = northwind.getCompanySqlList("Select * from vw_simpleCompanyOverview", companyList);
                 cboCompany.ItemsSource = companyList;           //Bind Combobox to List
                 cboFilterCompany.ItemsSource = companyList;
-                
+
+                foreach (Company c in companyList)
+                {
+                    if (!cboCountries.Items.Contains(c.country))
+                    {
+                        cboCountries.Items.Add(c.country);
+                    }
+                }
+
                 categoryList = northwind.getCategorySqlList("Select CategoryName from Categories", categoryList);
                 cboCategory.ItemsSource = categoryList;         //Bind Combobox to List
                 cboFilterCategory.ItemsSource = categoryList;
@@ -107,12 +117,21 @@ namespace DataPresent
                 txtIDProduct.IsReadOnly = true;
                 dgvCompanies.IsEnabled = true;
                 txtIDCompany.IsReadOnly = true;
-                
+
                 //Groupbox/lock IDs
                 grbProductDataRow.Visibility = Visibility.Visible;
                 grbCompanyDataRow.Visibility = Visibility.Hidden;
                 grbProductFilter.Visibility = Visibility.Visible;
-                btnProductFilterActivate.Visibility = Visibility.Visible;
+                grbCompanyFilter.Visibility = Visibility.Hidden;
+                btnFilterActivate.Visibility = Visibility.Visible;
+                btnFilterActivate.IsEnabled = true;
+                btnFilterDeactivate.Visibility = Visibility.Visible;
+                btnFilterDeactivate.IsEnabled = false;
+                btnFilter.Visibility = Visibility.Visible;
+                btnFilter.IsEnabled = false;
+                filterProductActive = false;
+                filterCompanyActive = false;
+
                 txtIDProduct.IsReadOnly = false;
                 txtIDCompany.IsReadOnly = false;
 
@@ -161,6 +180,8 @@ namespace DataPresent
                     txtPostalCode.Clear();
                     txtPhone.Clear();
 
+                    cboCountries.Items.Clear();
+
                     //Tables
                     tableProducts.Clear();
                     dgvProducts.ItemsSource = null;
@@ -172,11 +193,12 @@ namespace DataPresent
                 //general
                 btnConnect.IsEnabled = true;
                 btnDisconnect.IsEnabled = false;
+                btnFilterActivate.IsEnabled = false;
                 //product
                 btnInsert.IsEnabled = false;
                 btnUpdate.IsEnabled = false;
                 btnDelete.IsEnabled = false;
-                btnProductFilterActivate.IsEnabled = false;
+                
                 //Company
                 btnAddCompany.IsEnabled = false;
                 btnEditCompany.IsEnabled = false;
@@ -187,8 +209,12 @@ namespace DataPresent
                 grbProductDataRow.Visibility = Visibility.Hidden;
                 grbCompanyDataRow.Visibility = Visibility.Hidden;
                 grbProductFilter.Visibility = Visibility.Hidden;
-                btnProductFilterActivate.Visibility = Visibility.Hidden;
-
+                grbCompanyFilter.Visibility = Visibility.Hidden;
+                btnFilterActivate.Visibility = Visibility.Hidden;
+                btnFilterDeactivate.Visibility = Visibility.Hidden;
+                btnFilter.Visibility = Visibility.Hidden;
+                filterProductActive = false;
+                filterCompanyActive = false;
             }
         }
 
@@ -202,8 +228,10 @@ namespace DataPresent
                     "\n-deleteActive: " + deleteActive +
                     "\n-formLocked: " + formLocked +
                     "\n-tabLocked: " + tabLocked +
-                    "\n-filterActive: " + filterActive +
-                    "\n-currentFilter: " + currentFilter + 
+                    "\n-filterProductActive: " + filterProductActive +
+                    "\n-currentProductFilter: " + currentProductFilter +
+                    "\n-filterCompanyActive: " + filterCompanyActive +
+                    "\n-currentCompanyFilter: " + currentCompanyFilter +
                     "\n-currentIDProduct: " + currentIDProduct +
                     "\n-maxIDProduct: " + maxIDProduct +
                     "\n-currentIDCompany" + currentIDCompany +
@@ -264,7 +292,7 @@ namespace DataPresent
 
         private void btnUpdate_Click(object sender, RoutedEventArgs e)
         {
-            
+
             if (updateActive == false)
             {
                 {
@@ -280,12 +308,12 @@ namespace DataPresent
                 btnDelete.IsEnabled = false;
                 btnInsert.IsEnabled = false;
                 btnDisconnect.IsEnabled = false;
-                btnProductFilterActivate.IsEnabled = false;
+                btnFilterActivate.IsEnabled = false;
                 btnUpdate.Content = "Save Changes";
-                
+
                 //to get into update/Insert
                 updateActive = true;
-                    
+
                 //to make sure that User can't change stuff through datagrid
                 dgvProducts.IsEnabled = false;
                 tabLocked = true;
@@ -307,9 +335,9 @@ namespace DataPresent
                 btnDelete.IsEnabled = true;
                 btnInsert.IsEnabled = true;
                 btnDisconnect.IsEnabled = true;
-                btnProductFilterActivate.IsEnabled = true;
+                btnFilterActivate.IsEnabled = true;
                 btnUpdate.Content = "Edit Product";
-                
+
                 //to get into fillpath
                 updateActive = false;
 
@@ -346,11 +374,11 @@ namespace DataPresent
 
         private void btnInsert_Click(object sender, RoutedEventArgs e)
         {
-            
+
             if (insertActive == false)
             {
                 //insert vorbereiten
-                
+
                 //lock tab and datagrid
                 dgvProducts.IsEnabled = false;
                 tabLocked = true;
@@ -377,7 +405,7 @@ namespace DataPresent
                 btnDelete.IsEnabled = false;
                 btnUpdate.IsEnabled = false;
                 btnDisconnect.IsEnabled = false;
-                btnProductFilterActivate.IsEnabled = false;
+                btnFilterActivate.IsEnabled = false;
                 btnInsert.Content = "Create Product";
 
                 //clear form
@@ -385,7 +413,7 @@ namespace DataPresent
                 txtUnitPrice.Text = null;
                 txtUnitsInStock.Text = null;
                 txtQuantityPerUnit.Text = null;
-                        
+
                 //get to InsertPath
                 insertActive = true;
 
@@ -409,12 +437,12 @@ namespace DataPresent
                 btnDelete.IsEnabled = true;
                 btnUpdate.IsEnabled = true;
                 btnDisconnect.IsEnabled = true;
-                btnProductFilterActivate.IsEnabled = true;
+                btnFilterActivate.IsEnabled = true;
                 btnInsert.Content = "Add Product";
-                
+
                 //leave InsertPath
                 insertActive = false;
-                
+
                 //Id textboxes are left empty
                 if (string.IsNullOrEmpty(txtProductName.Text))
                 {
@@ -434,11 +462,11 @@ namespace DataPresent
                 }
                 if (string.IsNullOrEmpty(cboCategory.Text))
                 {
-                    cboCategory.SelectedItem = randInt.Next(cboCategory.Items.Count)-1;
+                    cboCategory.SelectedItem = randInt.Next(cboCategory.Items.Count) - 1;
                 }
                 if (string.IsNullOrEmpty(cboCompany.Text))
                 {
-                    cboCategory.SelectedItem = randInt.Next(cboCompany.Items.Count)-1;
+                    cboCategory.SelectedItem = randInt.Next(cboCompany.Items.Count) - 1;
                 }
 
                 //fill Product with values
@@ -455,15 +483,15 @@ namespace DataPresent
 
 
                 //Insertcommand
-                    tableProducts = northwind.insertSqlProduct("Insert into vw_simpleProductOverview" +
-                "(ProductName, CompanyName, CategoryName, QuantityPerUnit, UnitPrice, UnitsInStock, Discontinued) " +
-                "values(@ProductName, @CompanyName, @CategoryName, @QuantityPerUnit, @UnitPrice, @UnitsInStock, @Discontinued)", product, tableProducts);
+                tableProducts = northwind.insertSqlProduct("Insert into vw_simpleProductOverview" +
+            "(ProductName, CompanyName, CategoryName, QuantityPerUnit, UnitPrice, UnitsInStock, Discontinued) " +
+            "values(@ProductName, @CompanyName, @CategoryName, @QuantityPerUnit, @UnitPrice, @UnitsInStock, @Discontinued)", product, tableProducts);
 
                 //enable datagrid and tab
                 dgvProducts.IsEnabled = true;
                 tabLocked = false;
                 tabNorthwind.IsEnabled = true;
-                
+
 
                 //Set new MaxID
                 maxIDProduct = northwind.getMaxIDUniversal(tableProducts);
@@ -494,7 +522,6 @@ namespace DataPresent
                     //Show right form
                     grbCompanyDataRow.Visibility = Visibility.Hidden;
                     grbProductDataRow.Visibility = Visibility.Visible;
-                    btnProductFilterActivate.Visibility = Visibility.Visible;
 
                     //Show right datagrid
                     dgvProducts.IsEnabled = true;
@@ -502,17 +529,18 @@ namespace DataPresent
                     dgvProducts.SelectedItem = currentIDProduct;
 
                     grbProductFilter.Visibility = Visibility.Visible;
+                    grbCompanyFilter.Visibility = Visibility.Hidden;
+
                 }
             }
             if (TabCompany.IsSelected)
             {
-                //When user picks Producttab
+                //When user picks Companytab
                 if (startedConnNorthwind == true)
                 {
                     //Show right form
                     grbCompanyDataRow.Visibility = Visibility.Visible;
                     grbProductDataRow.Visibility = Visibility.Hidden;
-                    btnProductFilterActivate.Visibility = Visibility.Hidden;
 
                     //Show right datagrid
                     dgvCompanies.IsEnabled = true;
@@ -521,10 +549,10 @@ namespace DataPresent
 
                     //Show right filters
                     grbProductFilter.Visibility = Visibility.Hidden;
+                    grbCompanyFilter.Visibility = Visibility.Visible;
+
                 }
             }
-            //if(TabEmployee.IsSelected)
-            
         }
 
         private void btnEditCompany_Click(object sender, RoutedEventArgs e)
@@ -588,16 +616,16 @@ namespace DataPresent
                 //--Update
                 //Fill Company with values for SQLClass
                 Company company = new Company(
-                    int.Parse(txtIDCompany.Text), 
-                    txtCompanyName.Text, 
-                    txtContactName.Text, 
-                    txtTitle.Text, 
-                    txtAddress.Text, 
-                    txtCity.Text, 
-                    txtPostalCode.Text, 
-                    txtCountry.Text, 
+                    int.Parse(txtIDCompany.Text),
+                    txtCompanyName.Text,
+                    txtContactName.Text,
+                    txtTitle.Text,
+                    txtAddress.Text,
+                    txtCity.Text,
+                    txtPostalCode.Text,
+                    txtCountry.Text,
                     txtPhone.Text);
-                
+
                 //hand SQLClass the command and company class
                 northwind.updateSqlCompany("update vw_simpleCompanyOverview " +
                     "set CompanyName = @CompanyName, " +
@@ -765,22 +793,22 @@ namespace DataPresent
 
         private void rdoFilterPAll_Checked(object sender, RoutedEventArgs e)
         {
-            currentFilter = "all";
+            currentProductFilter = "all";
         }
 
         private void rdoFilterPGroupCategories_Checked(object sender, RoutedEventArgs e)
         {
-            currentFilter = "groupCategories";
+            currentProductFilter = "groupCategories";
         }
 
         private void rdoFilterPGroupCompanies_Checked(object sender, RoutedEventArgs e)
         {
-            currentFilter = "groupCompanies";
+            currentProductFilter = "groupCompanies";
         }
 
         private void rdoFilterPoneCompany_Checked(object sender, RoutedEventArgs e)
         {
-            currentFilter = "oneCompany";
+            currentProductFilter = "oneCompany";
 
             //activate given checkbox
             cboFilterCompany.IsEnabled = true;
@@ -794,7 +822,7 @@ namespace DataPresent
 
         private void rdoFilterPoneCategory_Checked(object sender, RoutedEventArgs e)
         {
-            currentFilter = "oneCategory";
+            currentProductFilter = "oneCategory";
 
             //activate given checkbox
             cboFilterCategory.IsEnabled = true;
@@ -808,7 +836,7 @@ namespace DataPresent
 
         private void rdoFilterPPrice_Checked(object sender, RoutedEventArgs e)
         {
-            currentFilter = "Price";
+            currentProductFilter = "Price";
             grdPrice.IsEnabled = true;
             txtFilterBetween1.IsEnabled = false;
             txtFilterBetween2.IsEnabled = false;
@@ -816,7 +844,7 @@ namespace DataPresent
             txtFilterUnder.IsEnabled = false;
 
         }
-         private void rdoFilterPPrice_Unchecked(object sender, RoutedEventArgs e)
+        private void rdoFilterPPrice_Unchecked(object sender, RoutedEventArgs e)
         {
             rdoFilterPPriceAbove.IsChecked = false;
             rdoFilterPPriceBetween.IsChecked = false;
@@ -839,7 +867,7 @@ namespace DataPresent
             txtFilterBetween1.IsEnabled = true;
             txtFilterBetween2.IsEnabled = true;
         }
-         private void rdoFilterPPriceBetween_Unchecked(object sender, RoutedEventArgs e)
+        private void rdoFilterPPriceBetween_Unchecked(object sender, RoutedEventArgs e)
         {
             txtFilterBetween1.IsEnabled = false;
             txtFilterBetween2.IsEnabled = false;
@@ -861,7 +889,7 @@ namespace DataPresent
         private void cboFilterCompany_DropDownOpened(object sender, EventArgs e)
         {
             //lock dropdown
-            if (currentFilter == "none")
+            if (currentProductFilter == "none")
             {
                 cboFilterCompany.IsDropDownOpen = false;
             }
@@ -874,143 +902,251 @@ namespace DataPresent
         private void cboFilterCategory_DropDownOpened(object sender, EventArgs e)
         {
             //lock dropdown
-            if (currentFilter == "none")
+            if (currentProductFilter == "none")
             {
                 cboFilterCategory.IsDropDownOpen = false;
             }
             else
             {
-                cboFilterCategory .IsDropDownOpen = true;
+                cboFilterCategory.IsDropDownOpen = true;
             }
         }
 
         private void btnFilterDeactivate_Click(object sender, RoutedEventArgs e)
         {
-            grbProductFilter.IsEnabled = false;
+            if (TabProduct.IsSelected && filterProductActive == true)
+            {
+                grbProductFilter.IsEnabled = false;
+            }
+            else if (TabCompany.IsSelected && filterCompanyActive == true)
+            {
+                grbCompanyFilter.IsEnabled = false;
+            }
         }
 
         private void btnFilterActivate_Click(object sender, RoutedEventArgs e)
         {
-            grbProductFilter.IsEnabled = true;
+            if (TabProduct.IsSelected && filterProductActive == false)
+            {
+                grbProductFilter.IsEnabled = true;
+            }
+            else if (TabCompany.IsSelected && filterCompanyActive == false)
+            {
+                grbCompanyFilter.IsEnabled = true;
+            }
         }
 
         private void btnFilter_Click(object sender, RoutedEventArgs e)
         {
             tableFilter = new DataTable();
-            
-            //Depending on clicked rdo: Fill Data into Table for Filter
-            switch (currentFilter)
+            if (filterProductActive == true)
             {
-                case "all":
-                    dgvProducts.ItemsSource = tableProducts.DefaultView;
-                    break;
-                case "groupCompanies":
-                    tableFilter = northwind.getSqlTableUniversal(
-                        "Select CompanyName, " +
-                        "count(ProductID) as Products " +
-                        "from vw_simpleProductOverview " +
-                        "where CompanyName is not null " +
-                        "group by CompanyName", tableFilter);
-                    dgvProducts.ItemsSource = tableFilter.DefaultView;
-                    break;
-                case "groupCategories":
-                    tableFilter = northwind.getSqlTableUniversal(
-                        "Select CategoryName, " +
-                        "count(ProductID) as Products " +
-                        "from vw_simpleProductOverview " +
-                        "where CategoryName is not null " +
-                        "group by CategoryName", tableFilter);
-                    dgvProducts.ItemsSource = tableFilter.DefaultView;
-                    break;
-                case "oneCompany":
-                    if (string.IsNullOrEmpty(cboFilterCompany.Text))
-                    {
-                        cboFilterCompany.SelectedIndex = randInt.Next(0, companyList.Count - 1);
-                    }
-                    tableFilter = northwind.getSqlTableUniversal(
-                        "Select * " +
-                        "from vw_simpleProductOverview " +
-                        "where CompanyName = '" + northwind.correctStringForSql(cboFilterCompany.Text) + "'", tableFilter);
-                    dgvProducts.ItemsSource = tableFilter.DefaultView;
-                    break;
-                case "oneCategory":
-                    if (string.IsNullOrEmpty(cboFilterCategory.Text))
-                    {
-                        cboFilterCategory.SelectedIndex = randInt.Next(0, categoryList.Count - 1);
-                    }
-                    tableFilter = northwind.getSqlTableUniversal(
-                        "Select * " +
-                        "from vw_simpleProductOverview " +
-                        "where CategoryName = '" + northwind.correctStringForSql(cboFilterCategory.Text) + "'", tableFilter);
-                    dgvProducts.ItemsSource = tableFilter.DefaultView;
-                    break;
-                case "Price":
-                    if (rdoFilterPPriceAbove.IsChecked == true)
-                    {
-                        if (string.IsNullOrEmpty(txtFilterAbove.Text))
+                //Depending on clicked rdo: Fill Data into Table for Filter
+                switch (currentProductFilter)
+                {
+                    case "all":
+                        //back to old table
+                        dgvProducts.ItemsSource = tableProducts.DefaultView;
+                        break;
+                    case "groupCompanies":
+                        //Count Products per Company
+                        tableFilter = northwind.getSqlTableUniversal(
+                            "Select CompanyName, " +
+                            "count(ProductID) as Products " +
+                            "from vw_simpleProductOverview " +
+                            "where CompanyName is not null " +
+                            "group by CompanyName", tableFilter);
+                        dgvProducts.ItemsSource = tableFilter.DefaultView;
+                        break;
+                    case "groupCategories":
+                        //Count Products per Category
+                        tableFilter = northwind.getSqlTableUniversal(
+                            "Select CategoryName, " +
+                            "count(ProductID) as Products " +
+                            "from vw_simpleProductOverview " +
+                            "where CategoryName is not null " +
+                            "group by CategoryName", tableFilter);
+                        dgvProducts.ItemsSource = tableFilter.DefaultView;
+                        break;
+                    case "oneCompany":
+                        //show all products to this Company
+                        if (string.IsNullOrEmpty(cboFilterCompany.Text))
                         {
-                            txtFilterAbove.Text = "20";
+                            //random Company if none chosen
+                            cboFilterCompany.SelectedIndex = randInt.Next(0, companyList.Count - 1);
                         }
                         tableFilter = northwind.getSqlTableUniversal(
-                        "Select * from vw_simpleProductOverview where UnitPrice > "
-                        + txtFilterAbove.Text, tableFilter);
+                            "Select * " +
+                            "from vw_simpleProductOverview " +
+                            "where CompanyName = '" + northwind.correctStringForSql(cboFilterCompany.Text) + "'", tableFilter);
                         dgvProducts.ItemsSource = tableFilter.DefaultView;
-                    }
-                    else
-                    {
-                        if (rdoFilterPPriceBetween.IsChecked == true)
+                        break;
+                    case "oneCategory":
+                        //show all products to this Category
+                        if (string.IsNullOrEmpty(cboFilterCategory.Text))
                         {
-                            if (string.IsNullOrEmpty(txtFilterBetween1.Text))
+                            //random Category if none chosen
+                            cboFilterCategory.SelectedIndex = randInt.Next(0, categoryList.Count - 1);
+                        }
+                        tableFilter = northwind.getSqlTableUniversal(
+                            "Select * " +
+                            "from vw_simpleProductOverview " +
+                            "where CategoryName = '" + northwind.correctStringForSql(cboFilterCategory.Text) + "'", tableFilter);
+                        dgvProducts.ItemsSource = tableFilter.DefaultView;
+                        break;
+                    case "Price":
+                        //Show Products related to a given price.
+                        if (rdoFilterPPriceAbove.IsChecked == true)
+                        {
+                            //above a value
+                            if (string.IsNullOrEmpty(txtFilterAbove.Text))
                             {
-                                txtFilterBetween1.Text = "20";
-                            }
-                            if (string.IsNullOrEmpty(txtFilterBetween2.Text))
-                            {
-                                txtFilterBetween2.Text = "25";
+                                //if none is given
+                                txtFilterAbove.Text = "20";
                             }
                             tableFilter = northwind.getSqlTableUniversal(
                             "Select * from vw_simpleProductOverview where UnitPrice > "
-                            + txtFilterBetween1.Text +
-                            " and UnitPrice < "
-                            + txtFilterBetween2.Text, tableFilter);
+                            + txtFilterAbove.Text, tableFilter);
                             dgvProducts.ItemsSource = tableFilter.DefaultView;
                         }
                         else
                         {
-                            if (rdoFilterPPriceLess.IsChecked == true)
+                            if (rdoFilterPPriceBetween.IsChecked == true)
                             {
-                                if (string.IsNullOrEmpty(txtFilterUnder.Text))
+                                //between 2 value
+                                if (string.IsNullOrEmpty(txtFilterBetween1.Text))
                                 {
-                                    txtFilterUnder.Text = "20";
+                                    //if none is given
+                                    txtFilterBetween1.Text = "20";
+                                }
+                                if (string.IsNullOrEmpty(txtFilterBetween2.Text))
+                                {
+                                    //if none is given
+                                    txtFilterBetween2.Text = "25";
                                 }
                                 tableFilter = northwind.getSqlTableUniversal(
-                                "Select * from vw_simpleProductOverview where UnitPrice < "
-                                + txtFilterUnder.Text, tableFilter);
+                                "Select * from vw_simpleProductOverview where UnitPrice > "
+                                + txtFilterBetween1.Text +
+                                " and UnitPrice < "
+                                + txtFilterBetween2.Text, tableFilter);
                                 dgvProducts.ItemsSource = tableFilter.DefaultView;
                             }
                             else
                             {
-                                MessageBox.Show("Bitte eine Option auswählen!", Title = "Achtung!");
-                                return;
-                            }
+                                if (rdoFilterPPriceLess.IsChecked == true)
+                                {
+                                    //below a value
+                                    if (string.IsNullOrEmpty(txtFilterUnder.Text))
+                                    {
+                                        //if none is given
+                                        txtFilterUnder.Text = "20";
+                                    }
+                                    tableFilter = northwind.getSqlTableUniversal(
+                                    "Select * from vw_simpleProductOverview where UnitPrice < "
+                                    + txtFilterUnder.Text, tableFilter);
+                                    dgvProducts.ItemsSource = tableFilter.DefaultView;
+                                }
+                                else
+                                {
+                                    //
+                                    MessageBox.Show("Bitte eine Option auswählen!", Title = "Achtung!");
+                                    return;
+                                }
 
+                            }
                         }
-                    }
-                    break;
+                        break;
+                }
+                grbProductFilter.IsEnabled = false;
             }
-            grbProductFilter.IsEnabled = false;
+            else if (filterCompanyActive == true)
+            {
+
+                switch (currentCompanyFilter)
+                {
+                    case "all":
+                        dgvCompanies.ItemsSource = tableCompanies.DefaultView;
+                        break;
+                    case "groupCountries":
+                        tableFilter = northwind.getSqlTableUniversal(
+                            "Select Country, count(CompanyID) as Companies " +
+                            "from vw_simpleCompanyOverview " +
+                            "where Country is not null " +
+                            "group by Country"
+                            , tableFilter);
+                        dgvCompanies.ItemsSource = tableFilter.DefaultView;
+                        break;
+                    case "oneCountry":
+                        if (string.IsNullOrEmpty(cboCountries.Text))
+                        {
+                            //random Category if none chosen
+                            cboCountries.SelectedIndex = randInt.Next(0, categoryList.Count - 1);
+                        }
+                        tableFilter = northwind.getSqlTableUniversal(
+                            "select * from tfn_lookUpCountry('" + northwind.correctStringForSql(cboCountries.Text) + "')"
+                            , tableFilter);
+                        dgvCompanies.ItemsSource = tableFilter.DefaultView;
+                        break;
+                    case "companyLetter":
+                        string nameLike;
+                        if (string.IsNullOrEmpty(txtFilterCLetters.Text))
+                        {
+                            nameLike = "exo";
+                        }
+                        else
+                        {
+                            nameLike = northwind.correctStringForSql(txtFilterCLetters.Text);
+                        }
+                        if (rdoFilterCompanyAny.IsChecked == true)
+                        {
+                            nameLike = "%" + nameLike + "%";
+                        }
+                        else if (rdoFilterCompanyMiddle.IsChecked == true)
+                        {
+                            nameLike = "%_" + nameLike + "_%";
+                        }
+                        else if (rdoFilterCompanyBegin.IsChecked == true)
+                        {
+                            nameLike = nameLike + "%";
+                        }
+                        else if (rdoFilterCompanyEnd.IsChecked == true)
+                        {
+                            nameLike = "%" + nameLike;
+                        }
+                        tableFilter = northwind.getSqlTableUniversal(
+                            "Select * from vw_simpleCompanyOverview where CompanyName like '" + nameLike + "'"
+                            , tableFilter);
+                        dgvCompanies.ItemsSource = tableFilter.DefaultView;
+                        MessageBox.Show("Results for search: \"" + txtFilterCLetters.Text + "\"");
+                        break;
+                    case "companyLength":
+                        string sortBy = " asc";
+                        
+                        if (rdoFilterCompanySortDesc.IsChecked == true)
+                        {
+                            sortBy = " desc";
+                        }
+                        tableFilter = northwind.getSqlTableUniversal(
+                            "Select *, len(CompanyName) as Namelenght from vw_simpleCompanyOverview order by Namelenght" + sortBy
+                            , tableFilter);
+                        dgvCompanies.ItemsSource = tableFilter.DefaultView;
+                        break;
+                }
+
+                grbCompanyFilter.IsEnabled = false;
+            }
         }
 
         private void grbProductFilter_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (startedConnNorthwind == true)
             {
-                if (filterActive == false)
+                if (filterProductActive == false)
                 {
                     //change Buttons
-                    btnProductFilterActivate.IsEnabled = false;
-                    btnProductFilterDeactivate.IsEnabled = true;
-                    btnProductFilter.IsEnabled = true;
+                    btnFilterActivate.IsEnabled = false;
+                    btnFilterDeactivate.IsEnabled = true;
+                    btnFilter.IsEnabled = true;
 
                     //change Radioboxes
                     rdoFilterPAll.IsEnabled = true;
@@ -1023,20 +1159,21 @@ namespace DataPresent
                     //disable Northwind Datagrids 
                     tabNorthwind.IsEnabled = false;
 
-                    filterActive = true;
+                    filterProductActive = true;
                 }
                 else
                 {
                     //change Buttons
-                    btnProductFilterActivate.IsEnabled = true;
-                    btnProductFilterDeactivate.IsEnabled = false;
-                    btnProductFilter.IsEnabled = false;
+                    btnFilterActivate.IsEnabled = true;
+                    btnFilterDeactivate.IsEnabled = false;
+                    btnFilter.IsEnabled = false;
 
                     //change Radioboxes
                     rdoFilterPAll.IsEnabled = false;
                     rdoFilterPGroupCategories.IsEnabled = false;
                     rdoFilterPGroupCompanies.IsEnabled = false;
                     rdoFilterPOneCategory.IsEnabled = false;
+
                     rdoFilterPOneCompany.IsEnabled = false;
                     rdoFilterPPrice.IsEnabled = false;
 
@@ -1044,7 +1181,7 @@ namespace DataPresent
                     tabNorthwind.IsEnabled = true;
 
                     //Deactivate currently picked radiobox
-                    switch (currentFilter)
+                    switch (currentProductFilter)
                     {
                         case "all":
                             rdoFilterPAll.IsChecked = false;
@@ -1065,12 +1202,153 @@ namespace DataPresent
                             rdoFilterPPrice.IsChecked = false;
                             break;
                     }
+                    //put filter back in old state
+                    currentProductFilter = "none";
 
-                    currentFilter = "none";
-
-                    filterActive = false;
+                    filterProductActive = false;
                 }
             }
         }
+
+        private void grbCompanyFilter_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (startedConnNorthwind == true)
+            {
+                if (filterCompanyActive == false)
+                {
+                    //change Buttons
+                    btnFilterActivate.IsEnabled = false;
+                    btnFilterDeactivate.IsEnabled = true;
+                    btnFilter.IsEnabled = true;
+
+                    //change Radioboxes/groupboxes
+                    rdoFilterCAll.IsEnabled = true;
+                    rdoFilterCCompaniesContaining.IsEnabled = true;
+                    rdoFilterCLookUpCountry.IsEnabled = true;
+                    rdoFilterCPerCountry.IsEnabled = true;
+                    rdoFilterCSortByNameLenght.IsEnabled = true;
+
+                    grdCSort.IsEnabled = false;
+                    grdFilterCNameWithLetters.IsEnabled = false;
+                    cboCountries.IsEnabled = false;
+
+                    //disable Northwind Datagrids 
+                    tabNorthwind.IsEnabled = false;
+
+                    filterCompanyActive = true;
+                }
+                else
+                {
+                    //change Buttons
+                    btnFilterActivate.IsEnabled = true;
+                    btnFilterDeactivate.IsEnabled = false;
+                    btnFilter.IsEnabled = false;
+
+                    //change Radioboxes
+                    rdoFilterCAll.IsEnabled = false;
+                    rdoFilterCCompaniesContaining.IsEnabled = false;
+                    rdoFilterCLookUpCountry.IsEnabled = false;
+                    rdoFilterCPerCountry.IsEnabled = false;
+                    rdoFilterCSortByNameLenght.IsEnabled = false;
+                    
+
+                    grdCSort.IsEnabled = false;
+                    grdFilterCNameWithLetters.IsEnabled = false;
+                    cboCountries.IsEnabled = false;
+
+                    //enable Northwind Datagrids again
+                    tabNorthwind.IsEnabled = true;
+
+                    //Deactivate currently picked radiobox
+                    switch (currentCompanyFilter)
+                    {
+                        case "all":
+                            rdoFilterCAll.IsChecked = false;
+                            break;
+                        case "groupCountries":
+                            rdoFilterCPerCountry.IsChecked = false;
+                            break;
+                        case "oneCountry":
+                            rdoFilterCLookUpCountry.IsChecked = false;
+                            break;
+                        case "companyLetter":
+                            rdoFilterCCompaniesContaining.IsChecked = false;
+                            break;
+                        case "companyLength":
+                            rdoFilterCSortByNameLenght.IsChecked = false;
+                            break;
+                    }
+                    //put filter back in old state
+                    currentCompanyFilter = "none";
+
+                    filterCompanyActive = false;
+                }
+            }
+        }
+
+        private void rdoFilterCAll_Checked(object sender, RoutedEventArgs e)
+        {
+            currentCompanyFilter = "all";
+        }
+
+        private void rdoFilterCPerCountry_Checked(object sender, RoutedEventArgs e)
+        {
+            currentCompanyFilter = "groupCountries";
+        }
+
+        private void rdoFilterCLookUpCountry_Checked(object sender, RoutedEventArgs e)
+        {
+            currentCompanyFilter = "oneCountry";
+            cboCountries.IsEnabled = true;
+        }
+
+        private void rdoFilterCLookUpCountry_Unchecked(object sender, RoutedEventArgs e)
+        {
+            cboCountries.SelectedIndex = -1;
+            cboCountries.IsEnabled = false;
+        }
+
+        private void txtbCompaniesContaining_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (rdoFilterCCompaniesContaining.IsChecked == false)
+            {
+                rdoFilterCCompaniesContaining.IsChecked = true;
+            }
+        }
+
+        private void rdoFilterCCompaniesContaining_Checked(object sender, RoutedEventArgs e)
+        {
+            currentCompanyFilter = "companyLetter";
+            grdFilterCNameWithLetters.IsEnabled = true;
+            rdoFilterCompanyAny.IsChecked = true;
+        }
+
+        private void rdoFilterCCompaniesContaining_Unchecked(object sender, RoutedEventArgs e)
+        {
+            currentCompanyFilter = "none";
+            grdFilterCNameWithLetters.IsEnabled = false;
+            rdoFilterCompanyAny.IsChecked = false;
+            rdoFilterCompanyBegin.IsChecked = false;
+            rdoFilterCompanyEnd.IsChecked = false;
+            rdoFilterCompanyMiddle.IsChecked = false;
+            txtFilterCLetters.Text = "";
+        }
+
+        private void rdoFilterCSortByNameLenght_Checked(object sender, RoutedEventArgs e)
+        {
+            currentCompanyFilter = "companyLength";
+            grdCSort.IsEnabled = true;
+            rdoFilterCompanySortAsc.IsChecked = true;
+        }
+
+        private void rdoFilterCSortByNameLenght_Unchecked(object sender, RoutedEventArgs e)
+        {
+            currentCompanyFilter = "none";
+            grdCSort.IsEnabled = false;
+            rdoFilterCompanySortAsc.IsChecked = false;
+            rdoFilterCompanySortDesc.IsChecked = false;
+        }
     }
 }
+
+
