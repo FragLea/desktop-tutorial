@@ -42,10 +42,17 @@ Select * from Categories
 
 create view vw_simpleProductOverview
 as 
-select P.ProductID, P.ProductName, S.CompanyName, C.CategoryName, P.QuantityPerUnit, P.UnitPrice, P.UnitsInStock, P.Discontinued 
-from Products P
-left join Suppliers S on P.SupplierID = S.SupplierID
-left join Categories C on P.CategoryID = C.CategoryID
+	select P.ProductID, 
+	P.ProductName, 
+	S.CompanyName, 
+	C.CategoryName, 
+	P.QuantityPerUnit, 
+	P.UnitPrice, 
+	P.UnitsInStock, 
+	P.Discontinued 
+	from Products P
+	left join Suppliers S on P.SupplierID = S.SupplierID
+	left join Categories C on P.CategoryID = C.CategoryID
 
 create trigger trig_insertSimpleProductOverview
 on vw_simpleProductOverview
@@ -164,7 +171,7 @@ as
 create trigger trig_insertSimpleCompanyOverview
 on vw_simpleCompanyOverview
 instead of insert
-as
+as 
 begin
 set nocount on;
 	Insert into Suppliers
@@ -237,6 +244,7 @@ select * from vw_simpleCompanyOverview
 select * from Suppliers
 select * from Products
 DBCC CHECKIDENT ( Suppliers, RESEED, 29 )
+DBCC CHECKIDENT ( Products, RESEED, 77 )
 
 /*P1*/
 Select count(ProductID), CompanyName from vw_simpleProductOverview where CompanyName is not null group by CompanyName
@@ -255,7 +263,7 @@ Select * from vw_simpleProductOverview where CategoryName = 'Mayumi''s'
 Select * from vw_simpleProductOverview where UnitPrice > 17 and UnitPrice < 22
 
 /*C1*/
-Select count(CompanyID), Country from vw_simpleCompanyOverview where Country is not null group by Country
+Select Country, count(CompanyID) as Companies from vw_simpleCompanyOverview where Country is not null group by Country
 
 /*C2*/
 select * from tfn_lookUpCountry('UK')
@@ -293,3 +301,5 @@ print 'Hello world'
 select 'Hello world'
 
 select * from tfn_lookUpCountry('UK')
+
+select * from [Summary of Sales by Year]

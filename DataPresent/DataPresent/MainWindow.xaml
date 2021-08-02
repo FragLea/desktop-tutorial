@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DataPresent"
         mc:Ignorable="d"
         Title="Northwind" Width="1057.775" Icon="/icons8-database-64.png" Height="481" ResizeMode="NoResize">
-
+    
     <Grid x:Name="grdBasicGrid" Margin="0,0,3.2,-19.8">
 
         <GroupBox x:Name="grbProductDataRow" Header="Product Data" HorizontalAlignment="Left" Height="143" Margin="176,263,0,0" VerticalAlignment="Top" Width="473" Visibility="Hidden">
@@ -78,12 +78,12 @@
                 <Grid HorizontalAlignment="Left" Height="53" Margin="-94,-89,0,0" VerticalAlignment="Top" Width="196"/>
             </Grid>
         </GroupBox>
-        <Button x:Name="btnFilterActivate" Content="Activate Filter" HorizontalAlignment="Left" Margin="664,416,0,0" VerticalAlignment="Top" Width="75" Height="20" IsEnabled="False" Click="btnFilterActivate_Click" Visibility="Hidden"/>
+        <Button x:Name="btnFilterActivate" Content="Activate Filter" HorizontalAlignment="Left" Margin="664,416,0,0" VerticalAlignment="Top" Width="75" Height="20" Click="btnFilterActivate_Click" Visibility="Hidden"/>
         <Button x:Name="btnFilterDeactivate" Content="Deactivate Filter" HorizontalAlignment="Left" Margin="865,416,0,0" VerticalAlignment="Top" Width="93" Height="20" IsEnabled="False" Click="btnFilterDeactivate_Click" RenderTransformOrigin="-0.176,0.3" Visibility="Hidden"/>
 
         <Border x:Name="brdDataView" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="253" Margin="10,10,0,0" VerticalAlignment="Top" Width="1028"/>
 
-        <Image x:Name="pngJelly" Margin="10,263,877,38" Source="ho7ps1gv.bmp" Stretch="Fill" MouseLeftButtonDown="pngJelly_MouseLeftButtonDown" Visibility="{Binding startedConnNorthwind}"/>
+        <Image x:Name="pngJelly" Margin="10,263,877,38" Source="ho7ps1gv.bmp" Stretch="Fill" MouseLeftButtonDown="pngJelly_MouseLeftButtonDown" Visibility="{Binding Path=startedConnNorthwind}"/>
         <Label x:Name="lblPngExplanation" Content="&lt;--This is a random jellyfish :P" HorizontalAlignment="Left" Margin="176,406,0,0" VerticalAlignment="Top" Height="26" Width="173"/>
         <TabControl x:Name="tabNorthwind" HorizontalAlignment="Left" Height="253" Margin="10,10,0,0" VerticalAlignment="Top" Width="1024" SelectionChanged="tabNorthwind_SelectionChanged" IsEnabled="False">
             <TabItem x:Name="TabProduct">

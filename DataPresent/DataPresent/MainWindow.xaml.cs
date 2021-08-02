@@ -24,7 +24,7 @@ namespace DataPresent
     /// </summary>
     public partial class MainWindow : Window
     {
-        public bool startedConnNorthwind = false;       //to make sure there is a connection to close/not another connection running
+        public bool startedConnNorthwind { get; private set; } = false;       //to make sure there is a connection to close/not another connection running
         public bool updateActive = false;               //to make sure you can't accidentaly change/enter anything! 
         public bool insertActive = false;               //-||-
         public bool deleteActive = false;               //-||-
@@ -52,6 +52,7 @@ namespace DataPresent
 
         public MainWindow()
         {
+            this.DataContext = this;
             InitializeComponent();
 
         }
