@@ -1,6 +1,4 @@
-# Welcome to GitHub Desktop!
+# Repository zum Programm des Praktikums 2021
 
-This is your README. READMEs are where you can communicate what your project is and how to use it.
-
-Write your name on line 6, save it, and then head back to GitHub Desktop.
-Lea Fragner
+c#, wpf, Datenbankanbindung, und und und
+Genaueres in der Präsentation
